@@ -1,4 +1,5 @@
 from django.http.response import  JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
@@ -7,26 +8,33 @@ from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@api_view(['GET', 'POST', 'PUT'])
 def category_list(request):
     if request.method == 'GET':
         categories = Category.objects.all()
-
         title = request.GET.get('title', None)
         if title is not None:
             categories = categories.filter(title__icontains=title)
         categories_serializer = CategorySerializer(categories, many=True)
         return JsonResponse(categories_serializer.data, safe=False)
     elif request.method == 'POST':
-        category_data = JSONParser().parse(request)
-        category_serializer = CategorySerializer(data=category_data)
+        category_serializer = CategorySerializer(data=request.data)
         if category_serializer.is_valid():
             category_serializer.save()
             return JsonResponse(category_serializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@api_view(['GET'])
+def items_of_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    items = Item.objects.filter(category=category)
+    if request.method == 'GET':
+        items_serializer = ItemSerializer(items, many=True)
+        return JsonResponse(items_serializer.data, safe=False)
+
+
+@api_view(['GET', 'POST'])
 def item_list(request):
     if request.method == 'GET':
         items = Item.objects.all()
@@ -46,7 +54,7 @@ def item_list(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def item_detail(request, pk):
-    item = Item.objects.get(pk=pk)
+    item = get_object_or_404(Item, pk=pk)
 
     if request.method == 'GET':
         item_serializer = ItemSerializer(item)
@@ -54,6 +62,10 @@ def item_detail(request, pk):
 
     elif request.method == 'PUT':
         item_data = JSONParser().parse(request)
+
+        for key, value in item_data.items():
+            setattr(item, key, value)
+        item.save()
         item_serializer = ItemSerializer(item, data=item_data)
         if item_serializer.is_valid():
             item_serializer.save()
@@ -63,4 +75,5 @@ def item_detail(request, pk):
     elif request.method == 'DELETE':
         item.delete()
         return JsonResponse({'message': 'Item was deleted successfully'})
+
 
