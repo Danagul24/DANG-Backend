@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import User
 
 
 class Category(models.Model):
@@ -17,6 +17,7 @@ class Item(models.Model):
         Category, related_name='items', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    UOM = models.CharField(blank=True)
     price = models.FloatField()
     discount = models.IntegerField(blank=True, null=True)
     city = models.CharField(blank=True)
