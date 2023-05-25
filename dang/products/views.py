@@ -27,6 +27,21 @@ def create_category(request):
     return Response(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['PUT', 'DELETE'])
+@permission_classes([IsAdminUser])
+def edit_delete_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'PUT':
+        category_serializer = CategorySerializer(instance=category, data=request.data)
+        if category_serializer.is_valid():
+            category_serializer.save()
+            return Response(category_serializer.data)
+        return Response(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        category.delete()
+        return Response({"message": "Category deleted successfully"})
+
+
 @api_view(['GET'])
 def items_of_category(request, pk):
     category = get_object_or_404(Category, pk=pk)

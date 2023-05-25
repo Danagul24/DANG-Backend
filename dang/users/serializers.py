@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.authtoken.models import Token
 from .models import User
 
 
@@ -8,10 +7,11 @@ class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=90)
     username = serializers.CharField(max_length=45)
     password = serializers.CharField(min_length=8, write_only=True)
+    is_seller = serializers.BooleanField(default=False)
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password']
+        fields = ['email', 'username', 'password', 'is_seller']
 
     def validate(self, attr):
         email_exists = User.objects.filter(email=attr['email']).exists()
@@ -29,6 +29,5 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
 
-        Token.objects.create(user=user)
         return user
 
