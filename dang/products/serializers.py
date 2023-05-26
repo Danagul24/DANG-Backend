@@ -6,7 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = "__all__"
+        fields = ["name", "description", "category", "UOM", "price", "discount", "city", "created_at"]
 
 
 class CategorySerializer(serializers.ModelSerializer):

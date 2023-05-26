@@ -1,101 +1,98 @@
+from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import status, generics, mixins
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
+from users.serializers import CurrentUserItemsSerializer
+
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
 
 
+class CategoryListCreateView(generics.GenericAPIView,
+                             mixins.ListModelMixin,
+                             mixins.CreateModelMixin):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
+    permission_classes = [IsAdminUser]
+
+    def get(self, request:Request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request:Request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class CategoryRetrieveUpdateDeleteView(generics.GenericAPIView,
+                                       mixins.RetrieveModelMixin,
+                                       mixins.UpdateModelMixin,
+                                       mixins.DestroyModelMixin):
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
+    queryset = Category.objects.all()
+
+    def get(self, pk:int):
+        category = get_object_or_404(Category, pk=pk)
+        items = Item.objects.filter(category=category)
+
+        item_serializer = ItemSerializer(items, many=True)
+        return Response(data=item_serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request: Request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request: Request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
+class ItemListCreateView(generics.GenericAPIView,
+                         mixins.ListModelMixin,
+                         mixins.CreateModelMixin):
+
+    serializer_class = ItemSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Item.objects.all()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(created_by=user)
+        return super().perform_create(serializer)
+
+    def get(self, request:Request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
+                                   mixins.RetrieveModelMixin,
+                                   mixins.UpdateModelMixin,
+                                   mixins.DestroyModelMixin):
+    serializer_class = ItemSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Item.objects.all()
+
+    def get(self, request: Request, *args, **kwargs):
+        return self.retrieve(request,*args, **kwargs)
+
+    def put(self, request: Request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request: Request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
 @api_view(['GET'])
-def category_list(request):
-    categories = Category.objects.all()
-    title = request.GET.get('title', None)
-    if title is not None:
-        categories = categories.filter(title__icontains=title)
-    categories_serializer = CategorySerializer(categories, many=True)
-    return Response(categories_serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def create_category(request):
-    category_serializer = CategorySerializer(data=request.data)
-    if category_serializer.is_valid():
-        category_serializer.save()
-        return Response(category_serializer.data, status=status.HTTP_201_CREATED)
-    return Response(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['PUT', 'DELETE'])
-@permission_classes([IsAdminUser])
-def edit_delete_category(request, pk):
-    category = get_object_or_404(Category, pk=pk)
-    if request.method == 'PUT':
-        category_serializer = CategorySerializer(instance=category, data=request.data)
-        if category_serializer.is_valid():
-            category_serializer.save()
-            return Response(category_serializer.data)
-        return Response(category_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        category.delete()
-        return Response({"message": "Category deleted successfully"})
-
-
-@api_view(['GET'])
-def items_of_category(request, pk):
-    category = get_object_or_404(Category, pk=pk)
-    items = Item.objects.filter(category=category)
-    if request.method == 'GET':
-        items_serializer = ItemSerializer(items, many=True)
-        return Response(items_serializer.data)
-
-
-@api_view(['GET'])
-def item_list(request):
-    items = Item.objects.all()
-    title = request.GET.get('title', None)
-    if title is not None:
-        items = items.filter(title__icontains=title)
-    items_serializer = ItemSerializer(items, many=True)
-    return Response(items_serializer.data)
-
-
-@api_view(['GET'])
-def item_detail(request, pk):
-    item = get_object_or_404(Item, pk=pk)
-    if request.method == 'GET':
-        item_serializer = ItemSerializer(item)
-        return Response(item_serializer.data)
-
-
-@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_item(request):
-    item_serializer = ItemSerializer(data=request.data)
-    if item_serializer.is_valid():
-        item_serializer.save()
-        return Response(item_serializer.data, status=status.HTTP_201_CREATED)
-    return Response(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def get_items_for_current_user(request: Request):
+    user = request.user
 
+    serializer = CurrentUserItemsSerializer(instance=user,
+                                            context={"request":request})
 
-@api_view(['PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def edit_delete_item(request, pk):
-    item = get_object_or_404(Item, pk=pk)
-    if request.method == 'PUT':
-        item_serializer = ItemSerializer(instance=item, data=request.data)
-        if item_serializer.is_valid():
-            item_serializer.save()
-            return Response(item_serializer.data)
-        return Response(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        item.delete()
-        return Response({'message': 'Item was deleted successfully'})
-
-
-
-
-
-
-
+    return Response(
+        data=serializer.data,
+        status=status.HTTP_200_OK
+    )

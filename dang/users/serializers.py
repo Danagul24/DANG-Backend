@@ -31,3 +31,13 @@ class SignUpSerializer(serializers.ModelSerializer):
 
         return user
 
+
+class CurrentUserItemsSerializer(serializers.HyperlinkedModelSerializer):
+    items = serializers.HyperlinkedRelatedField(many=True,
+                                                view_name="item_detail",
+                                                queryset=User.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'username', 'items']
+
