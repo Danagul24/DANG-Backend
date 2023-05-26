@@ -1,10 +1,9 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import IsAdminUser, SAFE_METHODS
 
 
-class SellerOrReadOnly(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
-            return True
+class IsAdminUserOrReadOnly(IsAdminUser):
+    def has_permission(self, request, view):
+        is_admin = super().has_permission(request, view)
+        return request.method in SAFE_METHODS or is_admin
 
-        return request.user.is_seller==True and obj.user.is_seller==True
 

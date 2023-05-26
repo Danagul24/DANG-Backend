@@ -8,6 +8,7 @@ from users.serializers import CurrentUserItemsSerializer
 
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
+from .permissions import IsAdminUserOrReadOnly
 
 
 class CategoryListCreateView(generics.GenericAPIView,
@@ -15,7 +16,7 @@ class CategoryListCreateView(generics.GenericAPIView,
                              mixins.CreateModelMixin):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUserOrReadOnly]
 
     def get(self, request:Request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -29,7 +30,7 @@ class CategoryRetrieveUpdateDeleteView(generics.GenericAPIView,
                                        mixins.UpdateModelMixin,
                                        mixins.DestroyModelMixin):
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUserOrReadOnly]
     queryset = Category.objects.all()
 
     def get(self, pk:int):
