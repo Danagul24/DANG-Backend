@@ -26,12 +26,6 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email=email, password=password, **extra_fields)
 
-    def create_seller(self, email, password):
-        user = self.create_user(email, password)
-        user.is_seller = True
-        user.save()
-        return user
-
 
 class User(AbstractUser):
     username = models.CharField(max_length=255)

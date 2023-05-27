@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import permission_classes
 from users.serializers import CurrentUserItemsSerializer
+from rest_framework.decorators import api_view
 
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
@@ -32,13 +33,6 @@ class CategoryRetrieveUpdateDeleteView(generics.GenericAPIView,
     serializer_class = CategorySerializer
     permission_classes = [IsAdminUserOrReadOnly]
     queryset = Category.objects.all()
-
-    def get(self, pk:int):
-        category = get_object_or_404(Category, pk=pk)
-        items = Item.objects.filter(category=category)
-
-        item_serializer = ItemSerializer(items, many=True)
-        return Response(data=item_serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -83,6 +77,14 @@ class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
 
     def delete(self, request: Request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+@api_view(['GET'])
+def items_of_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    items = Item.objects.filter(category=category)
+    item_serializer = ItemSerializer(items, many=True)
+    return Response(data=item_serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
