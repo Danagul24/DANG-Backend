@@ -60,6 +60,13 @@ class ItemListCreateView(generics.GenericAPIView,
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+    def get_queryset(self):
+        queryset = Item.objects.all()
+        sort = self.request.query_params.get('sort')
+        if sort is not None:
+            queryset = queryset.order_by(sort)
+        return queryset
+
 
 class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
                                    mixins.RetrieveModelMixin,
