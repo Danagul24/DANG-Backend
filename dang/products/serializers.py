@@ -3,10 +3,11 @@ from .models import Category, Item
 
 
 class ItemSerializer(serializers.ModelSerializer):
+    expiry_date = serializers.DateField(format="%d.%m.%Y")
 
     class Meta:
         model = Item
-        fields = ["name", "description", "category", "UOM", "price", "discount", "city", "created_at"]
+        fields = ["name", "description", "category", "UOM", "price", "discount", "expiry_date", "city", "created_at"]
 
 
 class CategorySerializer(serializers.ModelSerializer):

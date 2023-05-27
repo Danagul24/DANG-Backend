@@ -29,8 +29,8 @@ class Item(models.Model):
     is_sold = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     #views = models.IntegerField(default=0)
-    #expiry_date = models.DateField(blank=True)
-    #status = models.CharField(default="standart")
+    expiry_date = models.DateField(blank=True, null=True)
+    status = models.CharField(default="standart")
     created_by = models.ForeignKey(
         User, related_name='items', on_delete=models.CASCADE)
 
