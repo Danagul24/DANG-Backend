@@ -5,7 +5,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('products.urls')),
     url(r'^auth/', include('accounts.urls')),
-    url(r'^user/', include('users.urls'))
+    url(r'^users/', include('users.urls'))
 
 
 ]
