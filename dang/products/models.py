@@ -1,10 +1,11 @@
 from django.db import models
-from users.models import User
+from accounts.models import User
 from django.contrib.auth import get_user_model
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    image = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -26,7 +27,7 @@ class Item(models.Model):
     discount = models.IntegerField(blank=True, default=0)
     city = models.CharField(blank=True)
     expiry_date = models.DateField(blank=True, null=True)
-    image = models.ImageField(upload_to='items_images', blank=True, null=True)
+    image = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='items', on_delete=models.CASCADE)

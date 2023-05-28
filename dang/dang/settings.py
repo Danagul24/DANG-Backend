@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'products',
-    'users',
+    'accounts',
     # third party apps
     'rest_framework',
     'rest_framework_simplejwt',
@@ -155,4 +155,4 @@ CORS_ORIGIN_WHITELIST = (
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'accounts.User'

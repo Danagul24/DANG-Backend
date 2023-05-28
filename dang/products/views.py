@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
-from users.serializers import CurrentUserItemsSerializer
+from accounts.serializers import CurrentUserItemsSerializer
 from rest_framework.decorators import api_view
 
 from .models import Category, Item

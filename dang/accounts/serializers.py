@@ -11,7 +11,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'is_seller']
+        fields = ['first_name', 'last_name', 'email', 'username', 'password', 'is_seller']
 
     def validate(self, attr):
         email_exists = User.objects.filter(email=attr['email']).exists()
