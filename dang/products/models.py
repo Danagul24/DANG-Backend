@@ -23,16 +23,16 @@ class Item(models.Model):
     description = models.TextField(blank=True, null=True)
     UOM = models.CharField(blank=True)
     price = models.FloatField()
-    discount = models.IntegerField(blank=True, null=True)
+    discount = models.IntegerField(blank=True, default=0)
     city = models.CharField(blank=True)
-    image = models.ImageField(upload_to='items_images', blank=True, null=True)
-    is_sold = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    #views = models.IntegerField(default=0)
     expiry_date = models.DateField(blank=True, null=True)
-    status = models.CharField(default="standart")
+    image = models.ImageField(upload_to='items_images', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='items', on_delete=models.CASCADE)
+    #views = models.IntegerField(default=0)
+    status = models.CharField(default="standart")
+    is_sold = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

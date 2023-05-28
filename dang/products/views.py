@@ -2,14 +2,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, mixins
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from users.serializers import CurrentUserItemsSerializer
 from rest_framework.decorators import api_view
 
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
-from .permissions import IsAdminUserOrReadOnly
+from .permissions import IsAdminUserOrReadOnly, IsSellerOrReadOnly
 
 
 class CategoryListCreateView(generics.GenericAPIView,
@@ -46,7 +46,7 @@ class ItemListCreateView(generics.GenericAPIView,
                          mixins.CreateModelMixin):
 
     serializer_class = ItemSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsSellerOrReadOnly]
     queryset = Item.objects.all()
 
     def perform_create(self, serializer):
@@ -63,9 +63,16 @@ class ItemListCreateView(generics.GenericAPIView,
     def get_queryset(self):
         queryset = Item.objects.all()
         sort = self.request.query_params.get('sort')
+        city = self.request.query_params.get('city')
+        price_min = self.request.query_params.get('price_min')
+        price_max = self.request.query_params.get('price_max')
         if sort is not None:
-            queryset = queryset.order_by(sort)
-        return queryset
+            return queryset.order_by(sort)
+        if city is not None:
+            return queryset.filter(city=city)
+        # if price_min is not None and price_max is not None:
+        #     dif = price_max - price_min
+        #     queryset.filter(price=)
 
 
 class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
@@ -73,14 +80,14 @@ class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
                                    mixins.UpdateModelMixin,
                                    mixins.DestroyModelMixin):
     serializer_class = ItemSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsSellerOrReadOnly]
     queryset = Item.objects.all()
 
     def get(self, request: Request, *args, **kwargs):
         return self.retrieve(request,*args, **kwargs)
 
-    def put(self, request: Request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def patch(self, request: Request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
     def delete(self, request: Request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)

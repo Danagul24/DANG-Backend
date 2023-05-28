@@ -1,5 +1,8 @@
+from django.contrib import messages
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework import generics, status
 from rest_framework.request import Request
 from .serializers import SignUpSerializer
@@ -54,3 +57,12 @@ class LoginView(APIView):
         }
 
         return Response(data=content, status=status.HTTP_200_OK)
+
+
+class LogoutView(APIView):
+    def get(self, request: Request):
+        logout(request)
+        return Response(data={"messages": "User logout"})
+
+
+
