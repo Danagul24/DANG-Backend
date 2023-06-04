@@ -70,6 +70,7 @@ class ItemListCreateView(generics.GenericAPIView,
         # if price_min is not None and price_max is not None:
         #     dif = price_max - price_min
         #     queryset.filter(price=)
+        return queryset
 
 
 class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,

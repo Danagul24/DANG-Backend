@@ -1,3 +1,4 @@
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, logout, login
@@ -7,7 +8,9 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 from .tokens import create_jwt_pair_for_user
 from .serializers import RegisterSerializer, PasswordChangeSerializer, UserProfileSerializer, SellerProfileSerializer
-
+from products.models import Item
+from products.serializers import ItemSerializer
+from products.permissions import IsSeller
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -85,5 +88,17 @@ class ProfileUpdateView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsSeller])
+def seller_items(request):
+    user = request.user
+    if user.seller.able_to_post:
+        items = Item.objects.filter(created_by=user)
+        serializer = ItemSerializer(items, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+    return Response({"message": "У вас нет необходимых разрешений"})
+
 
 

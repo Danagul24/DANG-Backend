@@ -22,3 +22,16 @@ class IsSellerOrReadOnly(BasePermission):
         if obj.created_by == request.user:
             return True
         return False
+
+
+class IsSeller(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_seller & request.user.seller.able_to_post:
+            return True
+        return False
+
+    # check whether the creator of object is the same as the user
+    def has_object_permission(self, request, view, obj):
+        if obj.created_by == request.user:
+            return True
+        return False

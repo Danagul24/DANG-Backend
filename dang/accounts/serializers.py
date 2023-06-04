@@ -79,4 +79,3 @@ class UserProfileSerializer(WritableNestedModelSerializer, serializers.ModelSeri
 
 
 
-
