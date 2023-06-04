@@ -2,9 +2,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, mixins
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes
-from accounts.serializers import CurrentUserItemsSerializer
 from rest_framework.decorators import api_view
 
 from .models import Category, Item
@@ -100,16 +97,3 @@ def items_of_category(request, pk):
     item_serializer = ItemSerializer(items, many=True)
     return Response(data=item_serializer.data, status=status.HTTP_200_OK)
 
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_items_for_current_user(request: Request):
-    user = request.user
-
-    serializer = CurrentUserItemsSerializer(instance=user,
-                                            context={"request":request})
-
-    return Response(
-        data=serializer.data,
-        status=status.HTTP_200_OK
-    )

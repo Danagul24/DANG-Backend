@@ -11,7 +11,7 @@ class IsSellerOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
-        if request.user.is_seller:
+        if request.user.is_seller & request.user.seller.able_to_post:
             return True
         return False
 

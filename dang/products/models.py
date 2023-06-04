@@ -14,9 +14,6 @@ class Category(models.Model):
         return self.name
 
 
-User = get_user_model()
-
-
 class Item(models.Model):
     category = models.ForeignKey(
         Category, related_name='items', on_delete=models.CASCADE)
