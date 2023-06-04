@@ -4,8 +4,7 @@ from django.contrib.auth import authenticate, logout, login
 from rest_framework import generics, status, mixins
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
+from drf_spectacular.utils import extend_schema
 from .tokens import create_jwt_pair_for_user
 from .serializers import RegisterSerializer, PasswordChangeSerializer, UserProfileSerializer, SellerProfileSerializer
 
@@ -13,6 +12,7 @@ from .serializers import RegisterSerializer, PasswordChangeSerializer, UserProfi
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
+    @extend_schema(responses=RegisterSerializer)
     def post(self, request: Request):
         data = request.data
         serializer = self.serializer_class(data=data)
@@ -47,19 +47,14 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request):
-        try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        logout(request)
+        return Response({"message": "User logout"})
 
 
 class ChangePassword(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=PasswordChangeSerializer)
     def post(self, request):
         serializer = PasswordChangeSerializer(context={'request': request}, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -71,6 +66,7 @@ class ChangePassword(APIView):
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=UserProfileSerializer)
     def get(self, request):
         user = request.user
         serializer = UserProfileSerializer(user)
@@ -81,6 +77,7 @@ class ProfileView(APIView):
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=UserProfileSerializer)
     def patch(self, request):
         user = request.user
         serializer = UserProfileSerializer(user, data=request.data)

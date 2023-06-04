@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, mixins
 from rest_framework.decorators import api_view
-
+from drf_spectacular.utils import extend_schema
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer
 from .permissions import IsAdminUserOrReadOnly, IsSellerOrReadOnly
@@ -91,6 +91,7 @@ class ItemRetrieveUpdateDeleteView(generics.GenericAPIView,
 
 
 @api_view(['GET'])
+@extend_schema(responses=ItemSerializer)
 def items_of_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
     items = Item.objects.filter(category=category)
