@@ -1,10 +1,9 @@
+from django.contrib.auth.models import AbstractUser
 from rest_framework import serializers
-from accounts.models import User
+from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'password', 'first_name', 'last_name', 'phone_number')
-        write_only_fields = ('password',)
-        read_only_fields = ('is_staff', 'is_superuser', 'is_active')
+
+
+
 
