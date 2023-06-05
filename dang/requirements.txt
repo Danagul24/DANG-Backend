@@ -11,6 +11,7 @@ cryptography==41.0.1
 defusedxml==0.7.1
 Django==4.2.1
 django-cors-headers==4.0.0
+django-environ==0.10.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-spectacular==0.26.2

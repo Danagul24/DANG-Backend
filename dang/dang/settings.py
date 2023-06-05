@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,10 @@ SECRET_KEY = 'django-insecure-0tf0l)m=&pb0n$%6=x^gv1c6+zl-da-@5^a$yys#j9oj2d8b_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'e3d5-87-255-201-182.ngrok-free.app',
+    'http://127.0.0.1:8000/'
+]
 
 # Application definition
 
@@ -104,12 +111,18 @@ WSGI_APPLICATION = 'dang.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'URL': env('DATABASE_URL'),
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
+        # 'NAME': 'postgres',
+        # 'USER': 'postgres',
+        # 'PASSWORD': '1234',
+        # 'HOST': '127.0.0.1',
+        # 'PORT': '5432',
 }
 
 # Password validation
