@@ -31,7 +31,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'e3d5-87-255-201-182.ngrok-free.app',
-    'http://127.0.0.1:8000/'
+    'http://127.0.0.1:8000/',
+    'https://dang-backend-i48hecgxl-danagul24.vercel.app/',
+    'dang-backend.vercel.app',
+
 ]
 
 # Application definition
