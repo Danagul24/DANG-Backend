@@ -100,7 +100,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'dang.wsgi.application'
+WSGI_APPLICATION = 'dang.wsgi.application.app'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

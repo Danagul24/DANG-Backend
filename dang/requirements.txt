@@ -45,4 +45,3 @@ Tree==0.2.4
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==2.0.2
-vercel==0.2.1
